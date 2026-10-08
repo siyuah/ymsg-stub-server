@@ -1,0 +1,15 @@
+## Build output
+bin/
+obj/
+
+## Local game DLLs — 不提交，需自行放置
+libs/
+
+## dotnet
+*.user
+*.suo
+.vs/
+
+## OS
+.DS_Store
+Thumbs.db
