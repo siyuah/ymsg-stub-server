@@ -74,6 +74,8 @@ public sealed class HttpGateway
         _logger.LogInformation("HTTP {Target}: {Name}（{Format}）→ {Len} bytes",
             target, handler.MessageName, wrapped ? "HttpTransMsg 封装" : "原始 protobuf", reply.Length);
         ctx.Response.ContentType = "application/octet-stream";
+        // 显式给出长度，不用 chunked 编码，兼容只认 Content-Length 的简易 HTTP 客户端
+        ctx.Response.ContentLength = reply.Length;
         await ctx.Response.Body.WriteAsync(reply, ctx.RequestAborted);
     }
 
