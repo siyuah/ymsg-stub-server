@@ -5,15 +5,14 @@ using YmsgStub.Server.Network;
 namespace YmsgStub.Server.Handlers;
 
 /// <summary>
-/// 进入地图（即进入游戏）：C→S EnterMap → S→C EnterMapAck，随后推送 EnterMapFinishNtfAck。
-/// EnterMapFinishNtfAck 在协议里没有对应的 C→S 请求，推测是服务器在玩家进入地图后主动下发，
-/// 这里紧跟在 EnterMapAck 之后发送；实际时机待抓包确认。
+/// 进入地图（11005，即进入游戏）：C→S EnterMap → S→C EnterMapAck（UIRoleSelect.RequestEnterMap）
+/// 返回角色的 BaseInfo / SelfInfo，地图由其中的 LastMapID / Pos 决定。
+/// 客户端加载完场景后会再发 EnterMapFinish（11006），见 <see cref="EnterMapFinishHandler"/>。
 /// </summary>
 public sealed class EnterMapHandler
     : MessageHandlerBase<EnterMap, EnterMapAck>
 {
-    public override uint MessageId => MsgIds.CS_EnterMap;
-    protected override uint AckId   => MsgIds.SC_EnterMapAck;
+    public override uint MessageId => MsgIds.EnterMap;
 
     // ERROR_CODE 枚举的取值未知，先用 1 表示通用失败
     private const uint RetFailed = 1;
@@ -33,7 +32,7 @@ public sealed class EnterMapHandler
         var player = _players.Find(req.PlayerID);
         if (player is null)
         {
-            // 存档只在内存里，服务器重启后客户端若带着旧角色 ID 重连会走到这里
+            // 存档文件被删除或更换后，客户端若带着旧角色 ID 重连会走到这里
             _logger.LogWarning("EnterMap: unknown playerId {Id}", req.PlayerID);
             return Task.FromResult<EnterMapAck?>(new EnterMapAck
             {
@@ -43,7 +42,7 @@ public sealed class EnterMapHandler
         }
 
         long now = ServerClock.NowLike(req.Time);
-        player.Self.LastLogin = now;
+        _players.UpdateLastLogin(player, now);
         session.PlayerId = req.PlayerID;
 
         var ack = new EnterMapAck
@@ -51,13 +50,11 @@ public sealed class EnterMapHandler
             RetCode   = 0,
             EnterType = req.EnterType,
             InitTime  = now,
-            BaseInfo  = player.Base.Clone(),
-            SelfInfo  = player.Self.Clone(),
+            BaseInfo  = player.ToPlayerBase(),
+            SelfInfo  = player.ToPlayerSelf(),
         };
-        session.EnqueuePush(MsgIds.SC_EnterMapFinishNtfAck, new EnterMapFinishNtfAck { RetCode = 0 });
-
         _logger.LogInformation("EnterMap: playerId={Id}, enterType={Type}, mapId={Map}",
-            req.PlayerID, req.EnterType, player.Base.LastMapID);
+            req.PlayerID, req.EnterType, player.MapId);
         return Task.FromResult<EnterMapAck?>(ack);
     }
 }

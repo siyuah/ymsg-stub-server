@@ -5,6 +5,9 @@ obj/
 ## Local game DLLs — 不提交，需自行放置
 libs/
 
+## 本地角色存档（Player:SaveFile）
+saves/
+
 ## dotnet
 *.user
 *.suo
