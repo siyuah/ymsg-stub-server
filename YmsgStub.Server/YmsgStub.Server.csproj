@@ -11,6 +11,12 @@
     <PackageReference Include="Scrutor" Version="5.0.2" />
   </ItemGroup>
 
+  <!-- 本地角色存档（Player:SaveFile）：Web SDK 默认把 *.json 当作 Content 复制到输出 / 发布目录，排除掉 -->
+  <ItemGroup>
+    <Content Remove="saves/**" />
+    <None Remove="saves/**" />
+  </ItemGroup>
+
   <!-- 游戏 DLL：本地引用，不随源码提交（见 .gitignore） -->
   <ItemGroup>
     <Reference Include="Google.Protobuf">

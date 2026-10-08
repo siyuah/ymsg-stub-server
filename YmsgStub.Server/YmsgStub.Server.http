@@ -1,6 +1,0 @@
-@YmsgStub.Server_HostAddress = http://localhost:5145
-
-GET {{YmsgStub.Server_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

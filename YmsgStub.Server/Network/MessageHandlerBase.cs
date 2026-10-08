@@ -16,8 +16,16 @@ public abstract class MessageHandlerBase<TReq, TAck> : IMessageHandler
             .GetProperty("Parser")!
             .GetValue(null)!;
 
+    /// <summary>通用失败的 RetCode。ERROR_CODE 枚举的取值未知，先用 1。</summary>
+    protected const uint RetFailed = 1;
+
     public abstract uint MessageId { get; }
-    protected abstract uint AckId { get; }
+
+    /// <summary>
+    /// 应答的消息 ID。MSGID2CS 中没有单独的 Ack 项，应答与请求共用同一个 ID
+    /// （如 AccountLogin 请求和 AccountLoginAck 应答都是 9020），一般无需重写。
+    /// </summary>
+    protected virtual uint AckId => MessageId;
 
     public async Task<(uint msgId, byte[] body)?> HandleAsync(
         byte[] body, ClientSession session)
