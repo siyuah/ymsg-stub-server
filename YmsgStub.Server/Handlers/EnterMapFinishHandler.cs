@@ -5,10 +5,10 @@ using YmsgStub.Server.Network;
 namespace YmsgStub.Server.Handlers;
 
 /// <summary>
-/// 地图加载完成（11006）：C→S EnterMapFinish → S→C EnterMapFinishNtfAck
-/// 枚举名没有 Ntf 后缀，按"无 Ntf = 客户端请求"的规则，这是客户端收到 EnterMapAck、
-/// 加载完场景后发来的；服务器不应在 EnterMapAck 之后主动推送。
-/// 协议里没有 EnterMapFinish 请求类型（推测 body 为空），因此直接实现 IMessageHandler，不解析请求。
+/// 地图加载完成（11006）：正常情况下这是服务器在 EnterMapAck 之后的推送（见 <see cref="EnterMapHandler"/>）。
+/// 这里兜底处理客户端主动发来 11006 的情况：同样回 EnterMapFinishNtfAck，并打警告日志——
+/// 出现这条日志说明 11006 实际是客户端请求，可以关闭 Protocol:PushEnterMapFinish。
+/// 协议里没有 EnterMapFinish 请求类型，因此直接实现 IMessageHandler，不解析请求。
 /// </summary>
 public sealed class EnterMapFinishHandler : IMessageHandler
 {
@@ -23,7 +23,8 @@ public sealed class EnterMapFinishHandler : IMessageHandler
 
     public Task<(uint msgId, byte[] body)?> HandleAsync(byte[] body, ClientSession session)
     {
-        _logger.LogInformation("EnterMapFinish: playerId={Id} 已进入地图", session.PlayerId);
+        _logger.LogWarning("客户端主动发送了 EnterMapFinish（11006，body {Len} bytes）：11006 是 C→S 请求，" +
+            "可将 Protocol:PushEnterMapFinish 设为 false", body.Length);
         return Task.FromResult<(uint msgId, byte[] body)?>((MessageId, _ack));
     }
 }

@@ -16,6 +16,9 @@ public abstract class MessageHandlerBase<TReq, TAck> : IMessageHandler
             .GetProperty("Parser")!
             .GetValue(null)!;
 
+    /// <summary>通用失败的 RetCode。ERROR_CODE 枚举的取值未知，先用 1。</summary>
+    protected const uint RetFailed = 1;
+
     public abstract uint MessageId { get; }
 
     /// <summary>

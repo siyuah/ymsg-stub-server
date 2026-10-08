@@ -18,6 +18,8 @@ public abstract class HttpMessageHandlerBase<TReq, TAck> : IHttpMessageHandler
 
     public abstract uint MessageId { get; }
 
+    public string MessageName => typeof(TReq).Name;
+
     public async Task<byte[]> HandleAsync(byte[] body)
     {
         var ack = await ProcessAsync(_parser.ParseFrom(body));

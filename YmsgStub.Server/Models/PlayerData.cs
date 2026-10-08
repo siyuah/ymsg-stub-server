@@ -48,4 +48,16 @@ public sealed class PlayerData
         PlayerID  = PlayerId,
         LastLogin = LastLogin,
     };
+
+    /// <summary>区服选择界面用的角色摘要（GetAllPlayerAck.Lists）。</summary>
+    public PlayerNode ToPlayerNode(uint regionId) => new()
+    {
+        PlayerID   = PlayerId,
+        PlayerName = Name,
+        PlayerLv   = Level,
+        Job        = (JOB_TYPE)Job,
+        Gender     = (GENDER_TYPE)Gender,
+        LastLogin  = LastLogin,
+        RegionID   = regionId,
+    };
 }
