@@ -7,7 +7,7 @@ namespace YmsgStub.Server.Models;
 /// 发给客户端时再转换成协议里的 PlayerBase / PlayerSelf。
 /// 职业 / 性别 / 国家按整数保存：客户端枚举的成员名未知，整数值可以无损往返。
 /// </summary>
-public sealed class PlayerData
+public sealed class CharSave
 {
     public ulong  PlayerId       { get; set; }
     public string Name           { get; set; } = string.Empty;

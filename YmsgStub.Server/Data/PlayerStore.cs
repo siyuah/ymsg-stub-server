@@ -27,7 +27,7 @@ public sealed class PlayerStore
     };
 
     private readonly object _lock = new();
-    private readonly List<PlayerData> _players;
+    private readonly List<CharSave> _players;
     private readonly string _savePath;
     private readonly ILogger<PlayerStore> _logger;
     private readonly uint _initialMapId;
@@ -48,12 +48,12 @@ public sealed class PlayerStore
             _players.Count, _savePath);
     }
 
-    public IReadOnlyList<PlayerData> All()
+    public IReadOnlyList<CharSave> All()
     {
         lock (_lock) return _players.ToList();
     }
 
-    public PlayerData? Find(ulong playerId)
+    public CharSave? Find(ulong playerId)
     {
         lock (_lock) return _players.Find(p => p.PlayerId == playerId);
     }
@@ -62,7 +62,7 @@ public sealed class PlayerStore
     /// 按客户端的创角选择生成一个 1 级角色并写盘。只填客户端选择的外观 / 职业和出生位置，
     /// 其余数值保持默认值。写盘失败时撤销创建并抛出异常。
     /// </summary>
-    public PlayerData Create(CreatePlayer req, long now)
+    public CharSave Create(CreatePlayer req, long now)
     {
         if (_initialMapId == 0)
             _logger.LogWarning("Player:InitialMapId 未配置（=0），客户端可能无法加载地图；" +
@@ -71,7 +71,7 @@ public sealed class PlayerStore
         lock (_lock)
         {
             ulong id = _players.Count == 0 ? FirstPlayerId : _players.Max(p => p.PlayerId) + 1;
-            var player = new PlayerData
+            var player = new CharSave
             {
                 PlayerId       = id,
                 Name           = string.IsNullOrEmpty(req.PlayerName) ? $"玩家{id}" : req.PlayerName,
@@ -102,7 +102,7 @@ public sealed class PlayerStore
     /// 进入地图前更新角色：记录登录时间；出生地图为 0（创建时 Player:InitialMapId 还没配置）
     /// 的角色改用当前配置的出生点。写盘失败只记日志，不影响进入游戏。
     /// </summary>
-    public void PrepareEnterMap(PlayerData player, long now)
+    public void PrepareEnterMap(CharSave player, long now)
     {
         lock (_lock)
         {
@@ -122,15 +122,15 @@ public sealed class PlayerStore
         }
     }
 
-    private static List<PlayerData> Load(string path)
+    private static List<CharSave> Load(string path)
     {
-        if (!File.Exists(path)) return new List<PlayerData>();
+        if (!File.Exists(path)) return new List<CharSave>();
 
-        List<PlayerData?> players;
+        List<CharSave?> players;
         try
         {
-            players = JsonSerializer.Deserialize<List<PlayerData?>>(File.ReadAllText(path), _jsonOptions)
-                ?? new List<PlayerData?>();
+            players = JsonSerializer.Deserialize<List<CharSave?>>(File.ReadAllText(path), _jsonOptions)
+                ?? new List<CharSave?>();
         }
         catch (JsonException ex)
         {

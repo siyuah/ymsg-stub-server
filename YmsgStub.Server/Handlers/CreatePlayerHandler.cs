@@ -26,7 +26,7 @@ public sealed class CreatePlayerHandler
     protected override Task<CreatePlayerAck?> ProcessAsync(
         CreatePlayer req, ClientSession session)
     {
-        PlayerData player;
+        CharSave player;
         try { player = _players.Create(req, ServerClock.Now(req.Time)); }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
