@@ -8293,6 +8293,9 @@
 ---
 # 消息 ID (MsgId*)
 
+> 注：本节导出不完整，下面三个都只是描述符容器类，没有枚举值。真正的消息 ID 枚举是 `MSGID2CS`
+> （名字全大写，未被 `MsgId*` 筛选匹配到）。用 `dotnet run -- --dump-msgids` 从 DLL 导出后补在本节。
+
 ## MsgIdCsReflection  (IsEnum=False)
    (非常量)  descriptor
 

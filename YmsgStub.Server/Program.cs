@@ -1,7 +1,14 @@
+using YmsgStub.Server;
+using YmsgStub.Server.Data;
 using YmsgStub.Server.Network;
+
+// dotnet run -- --dump-msgids：导出客户端 DLL 中的真实消息 ID 后退出
+if (args.Contains("--dump-msgids"))
+    return MsgIdCatalog.Dump(Console.Out);
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddSingleton<PacketRouter>();
+builder.Services.AddSingleton<PlayerStore>();
 builder.Services.AddSingleton<GameServer>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<GameServer>());
 
@@ -19,3 +26,4 @@ var router = host.Services.GetRequiredService<PacketRouter>();
 router.RegisterAll(host.Services);
 
 await host.RunAsync();
+return 0;

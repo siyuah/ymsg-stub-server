@@ -18,6 +18,9 @@ public sealed class ClientSession
     private readonly ILogger _logger;
     private readonly CancellationToken _ct;
 
+    // handler 处理当前请求期间排队的推送，在应答之后发出
+    private readonly List<(uint msgId, byte[] body)> _pushes = new();
+
     // 会话级玩家状态，handler 可读写
     public ulong PlayerId { get; set; }
     public string Account { get; set; } = string.Empty;
@@ -54,6 +57,10 @@ public sealed class ClientSession
                 var response = await _router.DispatchAsync(msgId, body, this);
                 if (response is not null)
                     await SendAsync(stream, response.Value.msgId, response.Value.body, _ct);
+
+                foreach (var (pushId, pushBody) in _pushes)
+                    await SendAsync(stream, pushId, pushBody, _ct);
+                _pushes.Clear();
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -66,6 +73,13 @@ public sealed class ClientSession
             _logger.LogInformation("Client disconnected: {EP}", endpoint);
         }
     }
+
+    /// <summary>
+    /// 排队一条推送消息，在当前请求的应答发出之后再发送（保证先 Ack 后推送）。
+    /// 只能在 handler 处理请求期间调用。
+    /// </summary>
+    public void EnqueuePush(uint msgId, IMessage message)
+        => _pushes.Add((msgId, message.ToByteArray()));
 
     private static async Task<bool> ReadExactAsync(
         NetworkStream stream, byte[] buf, CancellationToken ct)
