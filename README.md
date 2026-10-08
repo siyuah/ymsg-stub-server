@@ -51,7 +51,7 @@ ymsg-stub-server/
    libs/Library.Assembly-CSharp.dll
    ```
 
-2. 按下文「配置」修改 `appsettings.json`，至少填好 `Player:InitialMapId`。
+2. 按下文「配置」检查 `appsettings.json`（客户端不在本机时至少要改 `Server:PublicHost`）。
 
 3. 运行服务器：
    ```bash
@@ -72,7 +72,7 @@ ymsg-stub-server/
 | `Server:PublicHost` | 127.0.0.1 | GetRegionLoginServer 告诉客户端的 TCP 地址；客户端在手机 / 模拟器上时改成本机局域网 IP |
 | `Region:Id` | 1 | 区服 ID，需是客户端区服配置表中存在的 ID |
 | `Region:Status` | 0 | 区服状态（SERVER_STATUS 的整数值，各值含义未知） |
-| `Player:InitialMapId` | 0 | 新角色出生地图，需取自客户端地图配置表；为 0 时客户端很可能无法加载地图 |
+| `Player:InitialMapId` | 3213 | 新角色出生地图（新手区；取自客户端 cfg_map_point.json 中最小的 MapID）。为 0 时客户端很可能无法加载地图 |
 | `Player:InitialPosX` / `InitialPosY` | 0 | 新角色出生坐标 |
 | `Player:SaveFile` | saves/players.json | 角色存档，相对于启动时的工作目录（`dotnet run` 时即项目目录） |
 | `Protocol:PushEnterMapFinish` | true | EnterMapAck 之后是否推送 EnterMapFinish（11006），见「登录流程」 |
@@ -84,7 +84,7 @@ ymsg-stub-server/
 - [x] HTTP 登录接口：GetAllRegion / GetAllPlayer / GetRegionLoginServer
 - [x] 登录流程：AppHeartBeat / GetServerTime / AccountLogin / CreatePlayer / EnterMap / EnterMapFinish
 - [x] 角色存档持久化（本地 JSON）
-- [ ] 新角色出生地图 ID（`Player:InitialMapId`）
+- [x] 新角色出生地图 ID（3213，新手区）
 - [ ] HTTP 账号登录（RequestToken / LoginAccount）、删除角色（DeletePlayer / CancelDeletePlayer）
 - [ ] 进入地图后客户端请求的各模块数据（背包、技能、任务……）
 
