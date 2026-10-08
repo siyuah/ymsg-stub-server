@@ -8,6 +8,10 @@ libs/
 ## 本地角色存档（Player:SaveFile）
 saves/
 
+## 服务器日志
+server.log
+*.log
+
 ## dotnet
 *.user
 *.suo
