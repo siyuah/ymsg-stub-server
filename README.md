@@ -73,7 +73,7 @@ ymsg-stub-server/
 | `Region:Id` | 1 | 区服 ID，需是客户端区服配置表中存在的 ID |
 | `Region:Status` | 0 | 区服状态（SERVER_STATUS 的整数值，各值含义未知） |
 | `Player:InitialMapId` | 3213 | 新角色出生地图（新手区；取自客户端 cfg_map_point.json 中最小的 MapID）。为 0 时客户端很可能无法加载地图 |
-| `Player:InitialPosX` / `InitialPosY` | 0 | 新角色出生坐标 |
+| `Player:InitialPosX` / `InitialPosY` | 3052 / 1055 | 新角色出生坐标（cfg_map_point.json 中地图 3213 的第一个点） |
 | `Player:SaveFile` | saves/players.json | 角色存档，相对于启动时的工作目录（`dotnet run` 时即项目目录） |
 | `Protocol:PushEnterMapFinish` | true | EnterMapAck 之后是否推送 EnterMapFinish（11006），见「登录流程」 |
 
