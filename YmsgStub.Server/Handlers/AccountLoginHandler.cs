@@ -10,9 +10,8 @@ namespace YmsgStub.Server.Handlers;
 public sealed class AccountLoginHandler
     : MessageHandlerBase<AccountLogin, AccountLoginAck>
 {
-    // TODO: 从 MsgIdCs 提取真实枚举值后更新这两个常量
-    public override uint MessageId => MsgIds.CS_AccountLogin;
-    protected override uint AckId   => MsgIds.SC_AccountLoginAck;
+    public override uint MessageId => MsgIds.AccountLogin;
+    protected override uint AckId   => MsgIds.AccountLogin; // Ack 与 Req 共用枚举，S→C 用相同 ID，客户端按方向区分
 
     private readonly ILogger<AccountLoginHandler> _logger;
 
